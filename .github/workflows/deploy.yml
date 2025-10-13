@@ -16,18 +16,36 @@ jobs:
  
     steps:
 
+      # Step 1: Checkout code
+
       - name: Checkout repository
 
         uses: actions/checkout@v3
  
+      # Step 2: Setup Node.js (must match your local Node version)
+
+      - name: Setup Node.js
+
+        uses: actions/setup-node@v3
+
+        with:
+
+          node-version: '20'
+ 
+      # Step 3: Install dependencies
+
       - name: Install dependencies
 
         run: npm ci
  
+      # Step 4: Build the React + Vite app
+
       - name: Build Vite React app
 
         run: npm run build
  
+      # Step 5: Configure AWS credentials for S3 deployment
+
       - name: Configure AWS credentials
 
         uses: aws-actions/configure-aws-credentials@v2
@@ -40,8 +58,24 @@ jobs:
 
           aws-region: ap-south-1
  
-      - name: Deploy to S3 bucket
+      # Step 6: Deploy build folder to S3 bucket
 
-        run: aws s3 sync dist/ s3://puzzlebite-frontend/ --delete
+      - name: Deploy to S3
+
+        run: |
+
+          echo "Syncing dist/ to S3 bucket..."
+
+          aws s3 sync dist/ s3://puzzlebite-frontend/ --delete
+
+          echo "Deployment complete!"
+ 
+      # Step 7 (Optional): Invalidate CloudFront cache if using CloudFront
+
+      #- name: Invalidate CloudFront cache
+
+      #  run: |
+
+      #    aws cloudfront create-invalidation --distribution-id E2GI074S0ZEA1R --paths "/*"
 
  
