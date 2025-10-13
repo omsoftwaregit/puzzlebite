@@ -6,7 +6,7 @@ on:
 
     branches:
 
-      - main
+      - main  # Run on push to main branch
  
 jobs:
 
@@ -74,11 +74,13 @@ jobs:
 
       - name: Invalidate CloudFront cache
 
+        if: secrets.CF_DISTRIBUTION_ID != ''
+
         run: |
 
           aws cloudfront create-invalidation \
 
-            --distribution-id E2GI074S0ZEA1R \
+            --distribution-id ${{ secrets.CF_DISTRIBUTION_ID }} \
 
             --paths "/*"
 
