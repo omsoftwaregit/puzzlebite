@@ -1,14 +1,35 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import './index.css';
 import { Menu as MenuIcon, X as CloseIcon, QrCode, Play, Tag, Shield, Zap, Star, Database, BarChart2 } from "lucide-react";
 
 
-function Section({ id, className = "", children }) {
+// Define props interface for Section component
+interface SectionProps {
+  id: string;
+  className?: string;
+  children: React.ReactNode;
+}
+
+function Section({ id, className = "", children }: SectionProps) {
   return (
-    <section id={id} className={`scroll-mt-28 min-h-screen py-36 ${className}`}>{children}</section>
+    <section id={id} className={`scroll-mt-28 min-h-screen py-36 ${className}`}>
+      {children}
+    </section>
   );
 }
 
-function Card({ image, title, price, description, Icon, children, tall }) {
+// Define props interface for Card component
+interface CardProps {
+  image: string;
+  title: string;
+  price?: string;
+  description?: string;
+  Icon?: React.ComponentType<{ className?: string }>;
+  children?: React.ReactNode;
+  tall?: boolean;
+}
+
+function Card({ image, title, price, description, Icon, children, tall }: CardProps) {
   const fallbackImg =
     "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80";
   return (
@@ -41,7 +62,7 @@ export default function PuzzleBITE() {
   );
   const [activeSection, setActiveSection] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const navRef = useRef(null);
+  const navRef = useRef<HTMLDivElement>(null); // Specify type for navRef
 
   // Contact form
   const [form, setForm] = useState({ email: "", phone: "", message: "" });
@@ -49,7 +70,7 @@ export default function PuzzleBITE() {
   const [sent, setSent] = useState(false);
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/mzzjkgya"; // add your Formspree endpoint if desired
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (sending) return;
     const email = form.email.trim();
@@ -67,7 +88,7 @@ export default function PuzzleBITE() {
         const res = await fetch(FORMSPREE_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, phone, message, to: "research@puzzlebite.app" })
+          body: JSON.stringify({ email, phone, message, to: "research@puzzlebite.app" }),
         });
         if (!res.ok) throw new Error("Form endpoint error");
         setSent(true);
@@ -99,8 +120,10 @@ export default function PuzzleBITE() {
     };
     window.addEventListener("scroll", handleScroll);
 
-    const onDocClick = (e) => {
-      if (menuOpen && navRef.current && !navRef.current.contains(e.target)) setMenuOpen(false);
+    const onDocClick = (e: MouseEvent) => {
+      if (menuOpen && navRef.current && !navRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", onDocClick);
 
@@ -119,12 +142,12 @@ export default function PuzzleBITE() {
     "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1600&q=80",
     "https://images.unsplash.com/photo-1607082349566-187342175e2c?auto=format&fit=crop&w=1600&q=80",
     "https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=1600&q=80",
-    "https://images.unsplash.com/photo-1522199710521-72d69614c702?auto=format&fit=crop&w=1600&q=80"
+    "https://images.unsplash.com/photo-1522199710521-72d69614c702?auto=format&fit=crop&w=1600&q=80",
   ];
   const pricingImages = [
     "https://images.unsplash.com/photo-1555992336-03a23c1f9003?auto=format&fit=crop&w=1600&q=80",
     "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1600&q=80",
-    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80"
+    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80",
   ];
 
   return (
@@ -219,7 +242,10 @@ export default function PuzzleBITE() {
         </div>
         <div className="md:w-1/2 flex justify-center mt-10 md:mt-0 hero-img-enter">
           <div className="hero-card">
-            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80" alt="Hero visual" />
+            <img
+              src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80"
+              alt="Hero visual"
+            />
           </div>
         </div>
       </Section>
@@ -234,7 +260,7 @@ export default function PuzzleBITE() {
           {[
             { title: "Scan QR", description: "Guests scan a QR to see exciting wait-time discounts.", Icon: QrCode, image: featureImages[0] },
             { title: "Play Challenges", description: "Crack puzzles & riddles to unlock rewards.", Icon: Play, image: featureImages[1] },
-            { title: "Earn Discounts", description: "Discount coupons redeemable now or later.", Icon: Tag, image: featureImages[2] }
+            { title: "Earn Discounts", description: "Discount coupons redeemable now or later.", Icon: Tag, image: featureImages[2] },
           ].map((f, i) => (
             <Card key={i} image={f.image} title={f.title} description={f.description} Icon={f.Icon} />
           ))}
@@ -253,7 +279,7 @@ export default function PuzzleBITE() {
             { title: "Multi-category puzzles", description: "Logic, trivia, coding & more.", Icon: Zap },
             { title: "Dashboards", description: "Track usage, redemptions & ROI.", Icon: Star },
             { title: "Live Feed", description: "Real-time events & updates.", Icon: Database },
-            { title: "Performance pricing", description: "Subscriptions + per-puzzle.", Icon: BarChart2 }
+            { title: "Performance pricing", description: "Subscriptions + per-puzzle.", Icon: BarChart2 },
           ].map((f, i) => (
             <Card key={i} image={featureImages[i % featureImages.length]} title={f.title} description={f.description} Icon={f.Icon} />
           ))}
@@ -270,7 +296,7 @@ export default function PuzzleBITE() {
           {[
             { title: "Differentiator", description: "First to truly gamify dining waits." },
             { title: "Delight", description: "Guests feel engaged and rewarded." },
-            { title: "Revenue", description: "Incentives that drive higher spend." }
+            { title: "Revenue", description: "Incentives that drive higher spend." },
           ].map((f, i) => (
             <div key={i} className="card-img">
               <img src={featureImages[(i + 2) % featureImages.length]} alt={f.title} />
@@ -293,7 +319,7 @@ export default function PuzzleBITE() {
           {[
             { tier: "Standard", desc: ["Up to 3 puzzles/day", "Basic theming", "Email support"], img: pricingImages[0] },
             { tier: "Gold", desc: ["Unlimited puzzles", "Custom theming", "Priority support"], img: pricingImages[1] },
-            { tier: "Premium", desc: ["Multi-venue", "Advanced analytics", "SLA & onboarding"], img: pricingImages[2] }
+            { tier: "Premium", desc: ["Multi-venue", "Advanced analytics", "SLA & onboarding"], img: pricingImages[2] },
           ].map((p, i) => (
             <div key={i} className="card-img">
               <img src={p.img} alt={p.tier} />
@@ -305,7 +331,9 @@ export default function PuzzleBITE() {
                     <li key={j} className="list-disc list-inside">{d}</li>
                   ))}
                 </ul>
-                <a href="#contact" className="btn-yellow rounded-xl px-5 py-2 font-semibold" onClick={handleLinkClick}>Request Pricing</a>
+                <a href="#contact" className="btn-yellow rounded-xl px-5 py-2 font-semibold" onClick={handleLinkClick}>
+                  Request Pricing
+                </a>
               </div>
             </div>
           ))}
@@ -406,9 +434,12 @@ export default function PuzzleBITE() {
           </form>
         </div>
         <p className="mt-6 text-white/70 text-sm">
-          Direct email: <a className="underline" href="mailto:research@puzzlebite.app">research@puzzlebite.app</a>
+          Direct email: <a className="underline" href="mailto:research@puzzlebite.app">
+            research@puzzlebite.app
+          </a>
         </p>
       </Section>
     </div>
   );
 }
+
