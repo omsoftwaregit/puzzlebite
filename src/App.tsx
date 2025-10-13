@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Menu as MenuIcon, X as CloseIcon, QrCode, Play, Tag, Shield, Zap, Star, Database, BarChart2 } from "lucide-react";
 
+
 function Section({ id, className = "", children }) {
   return (
     <section id={id} className={`scroll-mt-28 min-h-screen py-36 ${className}`}>{children}</section>
