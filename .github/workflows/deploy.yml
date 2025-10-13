@@ -6,23 +6,25 @@ on:
 
     branches:
 
-      - main  # Change if your main branch is different
+      - main
  
 jobs:
 
   deploy:
 
+    name: Build and Deploy
+
     runs-on: ubuntu-latest
  
     steps:
 
-      # Step 1: Checkout code
+      # Step 1: Checkout the repository
 
       - name: Checkout repository
 
         uses: actions/checkout@v3
  
-      # Step 2: Setup Node.js (must match your local Node version)
+      # Step 2: Setup Node.js
 
       - name: Setup Node.js
 
@@ -30,21 +32,21 @@ jobs:
 
         with:
 
-          node-version: '20'
+          node-version: 20
  
       # Step 3: Install dependencies
 
       - name: Install dependencies
 
-        run: npm ci
+        run: npm install
  
-      # Step 4: Build the React + Vite app
+      # Step 4: Build the React + Vite project
 
-      - name: Build Vite React app
+      - name: Build project
 
         run: npm run build
  
-      # Step 5: Configure AWS credentials for S3 deployment
+      # Step 5: Configure AWS credentials
 
       - name: Configure AWS credentials
 
@@ -58,24 +60,26 @@ jobs:
 
           aws-region: ap-south-1
  
-      # Step 6: Deploy build folder to S3 bucket
+      # Step 6: Deploy to S3
 
       - name: Deploy to S3
 
         run: |
 
-          echo "Syncing dist/ to S3 bucket..."
+          aws s3 sync ./dist s3://puzzlebite-frontend --delete
 
-          aws s3 sync dist/ s3://puzzlebite-frontend/ --delete
-
-          echo "Deployment complete!"
+          aws s3 cp ./dist/index.html s3://puzzlebite-frontend/index.html
  
-      # Step 7 (Optional): Invalidate CloudFront cache if using CloudFront
+      # Step 7: Invalidate CloudFront cache (optional)
 
-      #- name: Invalidate CloudFront cache
+      - name: Invalidate CloudFront cache
 
-      #  run: |
+        run: |
 
-      #    aws cloudfront create-invalidation --distribution-id E2GI074S0ZEA1R --paths "/*"
+          aws cloudfront create-invalidation \
+
+            --distribution-id E2GI074S0ZEA1R \
+
+            --paths "/*"
 
  
