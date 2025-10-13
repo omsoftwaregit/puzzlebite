@@ -315,7 +315,7 @@ export default function PuzzleBITE() {
       <Section id="contact" className="text-center text-white">
         <h2 className="text-5xl font-extrabold mb-6 gradient-text">Get in touch </h2>
         <p className="text-4xl mb-8 gradient-text">Ready to bring PuzzleBITE to your venue and avail Earlybird Discounts ? Let’s talk.</p>
-        <a href="mailto:info@puzzlebite.com" className="rounded-xl px-6 py-3 font-semibold btn-gradient inline-block" onClick={handleLinkClick}>Contact Us</a>
+        <a href="mailto:research@puzzlebite.com" className="rounded-xl px-6 py-3 font-semibold btn-gradient inline-block" onClick={handleLinkClick}>Contact Us</a>
       </Section>
 
     </div>
