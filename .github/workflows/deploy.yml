@@ -7,11 +7,10 @@ on:
 
 jobs:
   deploy:
-    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -25,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4️⃣ Clean previous build
+      # 4️⃣ Clean old build
       - name: Clean previous build
         run: rm -rf dist
 
@@ -41,10 +40,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # 7️⃣ Deploy to S3
+      # 7️⃣ Deploy assets to S3
       - name: Deploy to S3
         run: |
-          # Sync all files to S3, remove old files
-          aws s3 sync ./dist s3://puzzlebite-frontend --delete --exact-timestamps
-          # Upload index.html separately with no-cache headers
-          aws s3 cp ./dist/index.html s3://puzzlebite-frontend/index.html --cache-control "no-cache, no-store, must-revalidate"
+          # Sync all JS/CSS (hashed) with long-term caching
+          aws s3 sync ./dist s3://puzzlebite-frontend \
+            --delete \
+            --exact-timestamps \
+            --exclude "index.html" \
+            --exclude "images/*" \
+            --cache-control "max-age=31536000, public"
+
+          # Upload index.html separately (no cache)
+          aws s3 cp ./dist/index.html s3://puzzlebite-frontend/index.html \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+          # Upload images folder separately (no cache)
+          aws s3 cp ./dist/images s3://puzzlebite-frontend/images \
+            --recursive \
+            --cache-control "no-cache, no-store, must-revalidate"
