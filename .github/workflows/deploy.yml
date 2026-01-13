@@ -1,41 +1,55 @@
 name: Deploy React + Vite to S3
- 
+
 on:
-  push:
-    branches:
-      - main
- 
+  workflow_dispatch:  # allows manual trigger
+  schedule:          # optional: auto-run every hour
+    - cron: '0 * * * *'  # every hour
+
 jobs:
   deploy:
-    name: Build and Deploy
+    name: Build and Deploy Client Code
     runs-on: ubuntu-latest
- 
+
     steps:
-      - name: Checkout repository
+      # Checkout your repo (pipeline)
+      - name: Checkout pipeline repo
         uses: actions/checkout@v3
- 
+
+      # Pull latest client code
+      - name: Clone client repo
+        run: |
+          git clone https://github.com/Loki-Singh/puzzlebite.git client-code
+          cd client-code
+          git checkout main  # or whichever branch client uses
+
+      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
- 
+
+      # Install dependencies
       - name: Install dependencies
-        run: npm install
- 
+        run: |
+          cd client-code
+          npm install
+
+      # Build project
       - name: Build project
-        run: npm run build
- 
+        run: |
+          cd client-code
+          npm run build
+
+      # Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
- 
+
+      # Deploy to S3
       - name: Deploy to S3
         run: |
-          # Sync all files to S3, remove old files
-          aws s3 sync ./dist s3://puzzlebite-frontend --delete
- 
-          # Upload index.html separately to ensure SPA loads latest JS/CSS
-          aws s3 cp ./dist/index.html s3://puzzlebite-frontend/index.html
+          aws s3 sync client-code/dist s3://puzzlebite-frontend --delete
+          aws s3 cp client-code/dist/index.html s3://puzzlebite-frontend/index.html
