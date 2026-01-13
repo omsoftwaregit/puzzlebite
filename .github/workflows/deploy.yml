@@ -36,13 +36,14 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          # 1️⃣ JS/CSS bundles (hashed) with long-term cache
+          # Upload JS/CSS/assets with long cache
           aws s3 sync ./dist s3://puzzlebite-frontend \
             --delete \
             --exact-timestamps \
             --exclude "index.html" \
-            --exclude "images/*" \
             --cache-control "max-age=31536000, public"
 
-          # 2️⃣ index.html with no-cache
-          aws s3 cp ./dist/index.html s3://
+          # Upload index.html with NO cache (CRITICAL)
+          aws s3 cp ./dist/index.html s3://puzzlebite-frontend/index.html \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --metadata-directive REPLACE
