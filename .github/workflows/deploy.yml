@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4️⃣ Clean old build
+      # 4️⃣ Clean previous build
       - name: Clean previous build
         run: rm -rf dist
 
@@ -43,7 +43,7 @@ jobs:
       # 7️⃣ Deploy assets to S3
       - name: Deploy to S3
         run: |
-          # Sync all JS/CSS (hashed) with long-term caching
+          # Sync JS/CSS bundles (hashed) with long-term caching
           aws s3 sync ./dist s3://puzzlebite-frontend \
             --delete \
             --exact-timestamps \
@@ -51,11 +51,13 @@ jobs:
             --exclude "images/*" \
             --cache-control "max-age=31536000, public"
 
-          # Upload index.html separately (no cache)
+          # Upload index.html separately with no-cache
           aws s3 cp ./dist/index.html s3://puzzlebite-frontend/index.html \
             --cache-control "no-cache, no-store, must-revalidate"
 
-          # Upload images folder separately (no cache)
-          aws s3 cp ./dist/images s3://puzzlebite-frontend/images \
-            --recursive \
-            --cache-control "no-cache, no-store, must-revalidate"
+          # Upload images folder with no-cache and replace spaces with underscores
+          find ./dist/images -type f -exec bash -c '
+            file="$1"
+            filename=$(basename "$file" | tr " " "_")
+            aws s3 cp "$file" s3://puzzlebite-frontend/images/$filename --cache-control "no-cache, no-store, must-revalidate"
+          ' _ {} \;
