@@ -1,9 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-// import tailwindcss from '@tailwindcss/vite'
- 
-// Serve from root domain
+
+// Change "puzzlebite" to your repo name if different
 export default defineConfig({
   plugins: [react()],
-  base: '/' // change this from '/puzzlebite/' to '/'
+  base: '/puzzlebite/'
 })
