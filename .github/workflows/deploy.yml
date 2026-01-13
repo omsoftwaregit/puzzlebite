@@ -1,9 +1,11 @@
-name: Deploy React + Vite to S3
+name: Deploy Client React + Vite to S3
 
+# Trigger manually or on push to main branch of your pipeline repo
 on:
-  workflow_dispatch:  # allows manual trigger
-  schedule:          # optional: auto-run every hour
-    - cron: '0 * * * *'  # every hour
+  workflow_dispatch:   # allows manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -11,36 +13,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout your repo (pipeline)
+      # Step 1: Checkout pipeline repo
       - name: Checkout pipeline repo
         uses: actions/checkout@v3
 
-      # Pull latest client code
+      # Step 2: Pull latest client code
       - name: Clone client repo
         run: |
           git clone https://github.com/Loki-Singh/puzzlebite.git client-code
           cd client-code
-          git checkout main  # or whichever branch client uses
+          git checkout main  # client branch to deploy
 
-      # Setup Node.js
+      # Step 3: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      # Install dependencies
+      # Step 4: Install dependencies safely
       - name: Install dependencies
         run: |
           cd client-code
-          npm install
+          npm ci
 
-      # Build project
+      # Step 5: Build project
       - name: Build project
         run: |
           cd client-code
           npm run build
 
-      # Configure AWS credentials
+      # Step 6: Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -48,7 +50,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # Deploy to S3
+      # Step 7: Deploy to S3
       - name: Deploy to S3
         run: |
           aws s3 sync client-code/dist s3://puzzlebite-frontend --delete
