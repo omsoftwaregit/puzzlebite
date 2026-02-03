@@ -17,10 +17,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// Change "puzzlebite" to your repo name if different
 export default defineConfig({
   plugins: [react()],
-  base: '/puzzlebite/', // this tells the browser that all assets are under /puzzlebite/
-  build: {
-    outDir: 'dist/puzzlebite', // 🔹 tell Vite to build directly into the 'puzzlebite' folder
-  },
+  base: '/puzzlebite/'
 })
