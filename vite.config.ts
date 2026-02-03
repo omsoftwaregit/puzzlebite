@@ -1,10 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Change "puzzlebite" to your repo name if different
 export default defineConfig({
   plugins: [react()],
-  base: '/puzzlebite/'
+  base: '/puzzlebite/',   // IMPORTANT: folder name in S3
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets'
+  }
 })
 
 // import { defineConfig } from 'vite'
